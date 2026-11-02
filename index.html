@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Soloscribe</title>
+<meta name="description" content="Soloscribe transkribiert Jazz-Soli aus Aufnahmen: Noten, Tabulatur, Griffbrett und Klavier – lokal auf dem Mac.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f2ea;
+  --paper: #fffdf8;
+  --ink: #1d1b18;
+  --muted: #6b645a;
+  --line: #ddd5c6;
+  --accent: #b5532a;
+  --accent-soft: #f1ded2;
+  --f1: #d9473b; --f2: #3f9d5a; --f3: #3a6fc4; --f4: #e0b12a;
+  --code-bg: #2a2723;
+  --code-ink: #f3ede2;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15130f; --paper: #1d1a16; --ink: #ede6d9; --muted: #a39a8b;
+    --line: #34302a; --accent: #e07a4b; --accent-soft: #3a2519;
+    --code-bg: #0f0e0b; --code-ink: #ede6d9;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #15130f; --paper: #1d1a16; --ink: #ede6d9; --muted: #a39a8b;
+  --line: #34302a; --accent: #e07a4b; --accent-soft: #3a2519;
+  --code-bg: #0f0e0b; --code-ink: #ede6d9;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 17px/1.6 Inter, system-ui, sans-serif;
+}
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+a { color: var(--accent); }
+h1, h2, h3 { font-family: Fraunces, Georgia, serif; font-weight: 600; line-height: 1.15; margin: 0; }
+h2 { font-size: clamp(26px, 4vw, 34px); margin-bottom: 12px; }
+h3 { font-size: 20px; margin-bottom: 6px; }
+p { margin: 0 0 12px; }
+.muted { color: var(--muted); }
+
+header.top { border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.brand { font-family: Fraunces, Georgia, serif; font-size: 22px; font-weight: 600; letter-spacing: .01em; }
+.brand span { color: var(--accent); }
+nav a { color: var(--muted); text-decoration: none; margin-left: 20px; font-size: 15px; }
+nav a:hover { color: var(--ink); }
+@media (max-width: 560px) { nav { display: none; } }
+
+.hero { padding: 64px 0 40px; display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; padding-top: 40px; gap: 32px; } }
+.eyebrow { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 14px; }
+.hero h1 { font-size: clamp(36px, 6vw, 58px); margin-bottom: 18px; }
+.hero h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
+.lede { font-size: 19px; color: var(--muted); max-width: 34em; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.pill { font-size: 13px; padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: var(--paper); }
+
+.board { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: 0 10px 30px rgb(0 0 0 / .06); }
+.board svg { display: block; width: 100%; height: auto; }
+.board .cap { font-size: 13px; color: var(--muted); margin-top: 10px; display: flex; gap: 14px; flex-wrap: wrap; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+
+section { padding: 56px 0; border-top: 1px solid var(--line); }
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 24px; counter-reset: s; }
+@media (max-width: 860px) { .steps { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
+.step { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.step::before { counter-increment: s; content: counter(s); font-family: Fraunces, Georgia, serif; font-size: 28px; color: var(--accent); display: block; margin-bottom: 4px; }
+.step p { font-size: 15px; color: var(--muted); margin: 0; }
+
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 32px; margin-top: 28px; }
+@media (max-width: 860px) { .features { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .features { grid-template-columns: 1fr; } }
+.feature p { font-size: 15.5px; color: var(--muted); }
+.feature h3::before { content: ""; display: block; width: 28px; height: 3px; background: var(--accent); margin-bottom: 12px; border-radius: 2px; }
+
+.metric { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+@media (max-width: 620px) { .metric { grid-template-columns: 1fr; } }
+.metric .card { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+.metric .label { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+.bar { display: flex; align-items: center; gap: 10px; font-size: 14px; margin: 6px 0; }
+.bar .name { width: 108px; flex: none; color: var(--muted); }
+.bar .track { flex: 1; height: 10px; background: var(--accent-soft); border-radius: 5px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--accent); border-radius: 5px; }
+.bar .fill.old { background: var(--muted); opacity: .5; }
+.bar .val { width: 36px; text-align: right; font-variant-numeric: tabular-nums; }
+
+pre { background: var(--code-bg); color: var(--code-ink); border-radius: 12px; padding: 18px 20px; overflow-x: auto; font: 14px/1.6 "JetBrains Mono", ui-monospace, monospace; margin: 16px 0; }
+pre .c { opacity: .55; }
+code { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: .9em; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+@media (max-width: 860px) { .two { grid-template-columns: 1fr; } }
+.two > *, .hero > * { min-width: 0; }
+kbd { font: 13px "JetBrains Mono", ui-monospace, monospace; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; background: var(--paper); }
+table.keys { width: 100%; border-collapse: collapse; font-size: 15px; }
+table.keys td { padding: 7px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.keys td:first-child { width: 42%; white-space: nowrap; }
+
+.note { font-size: 14px; color: var(--muted); border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; margin-top: 24px; }
+footer { border-top: 1px solid var(--line); padding: 28px 0 40px; font-size: 14px; color: var(--muted); }
+footer p { margin: 4px 0; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Solo<span>scribe</span></div>
+    <nav>
+      <a href="#ablauf">Ablauf</a>
+      <a href="#funktionen">Funktionen</a>
+      <a href="#genauigkeit">Genauigkeit</a>
+      <a href="#installation">Installation</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Transkription für Jazzmusiker</div>
+      <h1>Vom Solo auf der Platte zu <em>Noten&nbsp;&amp;&nbsp;Tab</em>.</h1>
+      <p class="lede">Soloscribe trennt das Solo aus der Aufnahme heraus und erkennt die Töne, auch Doppelgriffe und Dreiklänge. Daraus werden Notenschrift, Tabulatur und ein mitlaufendes Griffbrett. Alles läuft lokal auf dem Mac.</p>
+      <div class="pills">
+        <span class="pill">Jazzgitarre</span>
+        <span class="pill">Klavier, beide Hände</span>
+        <span class="pill">Andere Instrumente</span>
+        <span class="pill">macOS · Apple Silicon</span>
+      </div>
+    </div>
+
+    <figure class="board" aria-label="Skizze: mitlaufendes Griffbrett mit Fingerfarben">
+      <svg viewBox="0 0 480 190" role="img" aria-hidden="true">
+        <!-- frets -->
+        <g stroke="var(--line)" stroke-width="2">
+          <line x1="20" y1="20" x2="20" y2="170" stroke="var(--ink)" stroke-width="5"/>
+          <line x1="100" y1="20" x2="100" y2="170"/><line x1="180" y1="20" x2="180" y2="170"/>
+          <line x1="260" y1="20" x2="260" y2="170"/><line x1="340" y1="20" x2="340" y2="170"/>
+          <line x1="420" y1="20" x2="420" y2="170"/>
+        </g>
+        <!-- inlays -->
+        <circle cx="220" cy="95" r="6" fill="var(--line)"/><circle cx="380" cy="95" r="6" fill="var(--line)"/>
+        <!-- strings -->
+        <g stroke="var(--muted)">
+          <line x1="20" y1="20" x2="470" y2="20" stroke-width="1"/>
+          <line x1="20" y1="50" x2="470" y2="50" stroke-width="1.2"/>
+          <line x1="20" y1="80" x2="470" y2="80" stroke-width="1.5"/>
+          <line x1="20" y1="110" x2="470" y2="110" stroke-width="1.9"/>
+          <line x1="20" y1="140" x2="470" y2="140" stroke-width="2.3"/>
+          <line x1="20" y1="170" x2="470" y2="170" stroke-width="2.7"/>
+        </g>
+        <!-- previous note (ring) -->
+        <circle cx="140" cy="110" r="11" fill="none" stroke="var(--f1)" stroke-width="2.5" opacity=".7"/>
+        <!-- sounding double stop -->
+        <circle cx="220" cy="80" r="15" fill="var(--f2)"/>
+        <text x="220" y="85" text-anchor="middle" font-size="14" font-family="Inter" font-weight="600" fill="#fff">2</text>
+        <circle cx="300" cy="50" r="15" fill="var(--f3)"/>
+        <text x="300" y="55" text-anchor="middle" font-size="14" font-family="Inter" font-weight="600" fill="#fff">3</text>
+        <!-- next notes, shrinking -->
+        <circle cx="380" cy="50" r="10" fill="var(--f4)" opacity=".85"/>
+        <circle cx="300" cy="20" r="7" fill="var(--f3)" opacity=".55"/>
+      </svg>
+      <figcaption class="cap">
+        <span><span class="dot" style="background:var(--f1)"></span>Zeigefinger</span>
+        <span><span class="dot" style="background:var(--f2)"></span>Mittelfinger</span>
+        <span><span class="dot" style="background:var(--f3)"></span>Ringfinger</span>
+        <span><span class="dot" style="background:var(--f4)"></span>kleiner Finger</span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <section id="ablauf">
+    <h2>So läuft es ab</h2>
+    <p class="muted">Ein Projekt pro Solo. Jeder Schritt lässt sich einzeln neu starten, bearbeitete Noten bleiben dabei erhalten.</p>
+    <div class="steps">
+      <div class="step"><h3>Import</h3><p>Nur den gewünschten Ausschnitt aus einem Video laden oder eine Audiodatei hochladen. Gespeichert wird verlustfrei als FLAC.</p></div>
+      <div class="step"><h3>Stems</h3><p>Demucs trennt Gitarre, Klavier, Bass, Schlagzeug und Gesang auf der Apple-GPU.</p></div>
+      <div class="step"><h3>Beats &amp; Takt</h3><p>beat_this findet Schläge und Taktanfänge. Ein kurzer Assistent prüft danach Takt, Raster und Tonart mit Metronom-Klick.</p></div>
+      <div class="step"><h3>Transkription</h3><p>Ein auf Jazzgitarre trainiertes Modell erkennt die Töne, für Klavier Transkun (beide Hände, Pedal). Andere Instrumente laufen mit basic-pitch.</p></div>
+    </div>
+  </section>
+
+  <section id="funktionen">
+    <h2>Was Soloscribe kann</h2>
+    <div class="features">
+      <div class="feature"><h3>Synchron anhören</h3><p>Original, Solo-Spur, Band ohne Solo zum Mitspielen oder die Transkription selbst. Langsamer abspielen ohne Tonhöhenänderung, Loops per Taste oder Ziehen.</p></div>
+      <div class="feature"><h3>Fehler hören</h3><p>„Original + Transkription“ spielt die erkannten Noten leise mit. So fallen falsche Töne sofort auf.</p></div>
+      <div class="feature"><h3>Live-Griffbrett</h3><p>Der Fingersatz wird automatisch berechnet und berücksichtigt Lagenwechsel, Strecken und Führungsfinger. Die nächsten Töne erscheinen als blasser werdende Punkte.</p></div>
+      <div class="feature"><h3>Noten &amp; Tab</h3><p>Notensatz mit alphaTab und passendem Raster pro Schlag: Achtel, Sechzehntel, Triolen, 32tel. Swing wird gerade notiert, mit Swing-Zeichen. Druck auf A4 oder als PDF.</p></div>
+      <div class="feature"><h3>Piano-Roll-Editor</h3><p>Noten verschieben, teilen, zusammenführen, quantisieren, kopieren und einfügen, auch zwischen Projekten. Alles mit Rückgängig.</p></div>
+      <div class="feature"><h3>Klavier</h3><p>Hände werden automatisch aufs Klaviersystem verteilt. Dazu Pedalzeichen, Fingersätze 1–5 und eine mitlaufende Klaviatur.</p></div>
+    </div>
+  </section>
+
+  <section id="genauigkeit">
+    <h2>Wie genau?</h2>
+    <p class="muted">Gemessen auf GuitarSet. F1 je Note: Tonhöhe exakt, Einsatz innerhalb von ±50&nbsp;ms. 1,0 wäre fehlerfrei.</p>
+    <div class="metric">
+      <div class="card">
+        <div class="label">90 Soli, alle Stile</div>
+        <div class="bar"><span class="name">basic-pitch</span><span class="track"><span class="fill old" style="width:82%"></span></span><span class="val">0,82</span></div>
+        <div class="bar"><span class="name">Gitarrenmodell</span><span class="track"><span class="fill" style="width:92%"></span></span><span class="val">0,92</span></div>
+      </div>
+      <div class="card">
+        <div class="label">36 Jazz-Soli im Bandmix, mit Demucs getrennt</div>
+        <div class="bar"><span class="name">basic-pitch</span><span class="track"><span class="fill old" style="width:83%"></span></span><span class="val">0,83</span></div>
+        <div class="bar"><span class="name">Gitarrenmodell</span><span class="track"><span class="fill" style="width:90%"></span></span><span class="val">0,90</span></div>
+      </div>
+    </div>
+    <p class="note">Noch nicht erkannt werden Bends, Slides, Hammer-ons und Dynamik.</p>
+  </section>
+
+  <section id="installation">
+    <div class="two">
+      <div>
+        <h2>Installation</h2>
+        <p class="muted">macOS mit Apple Silicon, <a href="https://brew.sh">Homebrew</a> und Node.js&nbsp;≥&nbsp;20. Der Quellcode liegt in einem privaten Repository, Zugang auf Anfrage.</p>
+<pre><span class="c"># Werkzeuge</span>
+brew install uv ffmpeg fluid-synth
+uv python install 3.11
+
+<span class="c"># Backend: lädt Modell (~100 MB) und SoundFont</span>
+cd backend
+uv sync
+uv run soloscribe setup
+
+<span class="c"># Frontend</span>
+cd ../frontend
+npm install
+
+<span class="c"># Starten → http://localhost:3000</span>
+cd .. &amp;&amp; ./dev.sh</pre>
+        <p class="muted" style="font-size:15px">Oder im Finder <code>Soloscribe.command</code> doppelklicken. Das Terminalfenster muss offen bleiben, solange Soloscribe läuft.</p>
+      </div>
+      <div>
+        <h2>Tastatur</h2>
+        <table class="keys">
+          <tr><td><kbd>Leertaste</kbd></td><td>Play / Pause</td></tr>
+          <tr><td><kbd>[</kbd> <kbd>]</kbd> · <kbd>Esc</kbd></td><td>Loop-Anfang / -Ende · Loop aus</td></tr>
+          <tr><td><kbd>+</kbd> <kbd>−</kbd></td><td>Tempo ± 5 %</td></tr>
+          <tr><td><kbd>1</kbd> – <kbd>6</kbd></td><td>Spur wählen (Original, Solo, ohne Solo …)</td></tr>
+          <tr><td><kbd>,</kbd> <kbd>.</kbd></td><td>vorige / nächste Note</td></tr>
+          <tr><td><kbd>Q</kbd></td><td>quantisieren</td></tr>
+          <tr><td><kbd>⌘Z</kbd> <kbd>⌘⇧Z</kbd></td><td>rückgängig / wiederholen</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Soloscribe ist ein Werkzeug zum Üben und Lernen. Bitte nur Material verwenden, das zu Lernzwecken genutzt werden darf. Audio wird nicht weiterverbreitet.</p>
+    <p>Mit Demucs, beat_this, basic-pitch, Transkun, dem Gitarrenmodell von Riley, Edwards &amp; Dixon (ICASSP 2024), alphaTab, Bravura und GeneralUser GS.</p>
+  </div>
+</footer>
+
+</body>
+</html>
